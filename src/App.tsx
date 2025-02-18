@@ -57,7 +57,6 @@ async function gensolana(){
   setSolanaKeyPair([...solanaKeyPair, keypair]);
   console.log(solanaKeyPair);
 }
-
 async function fetchSolanaBalance(address:string){
   
   const url='https://solana-devnet.g.alchemy.com/v2/'+apiKey;
