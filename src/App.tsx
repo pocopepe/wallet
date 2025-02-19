@@ -3,8 +3,10 @@ import {generateMnemonic, mnemonicToSeed} from 'bip39';
 import { derivePath, getPublicKey } from 'ed25519-hd-key'
 import { PublicKey, LAMPORTS_PER_SOL, Keypair } from '@solana/web3.js';
 import {ethers} from 'ethers';
-import { Transaction, SystemProgram, Connection, sendAndConfirmTransaction} from "@solana/web3.js";
+// import { Transaction, SystemProgram, Connection, sendAndConfirmTransaction} from "@solana/web3.js";
 import { keccak256 } from "ethers";
+import {eth} from 'web3';
+// import {utils} from 'web3';
 
 function App() {
   const [mnemonic, setMnemonic]=useState('')
@@ -16,6 +18,7 @@ function App() {
   const [refreshEth, setRefreshEth]=useState(true);
   const apiKey=import.meta.env.VITE_THEKEY;
   const [solanaKeyPair, setSolanaKeyPair]=useState<Keypair[]>([]);
+  const [ethKeyPair, setEthKeyPair]= useState<ethers.HDNodeWallet[]>([]);
   
   useEffect(() => {
     const fetchBalances = async () => {
@@ -79,7 +82,7 @@ async function genEth(){
   const wallet = hdNode.derivePath(path);
   const address = "0x" + keccak256(wallet.publicKey).slice(-40);
   setEth([...eth, address]);
-  console.log(wallet);
+  setEthKeyPair([...ethKeyPair, wallet]);
 }
 
 async function fetchEthBalance(address:string){
@@ -93,31 +96,41 @@ async function fetchEthBalance(address:string){
   return Number(balance.result) / 1e18;
 }
 
-async function solanaTransaction(fromAddress:string, toAddress:string, amount:number, senderKeypair:Keypair){
-  const transaction= new Transaction();
-  const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-  const fromPubkey = new PublicKey(fromAddress);
-  const toPubkey = new PublicKey(toAddress);
+// async function solanaTransaction(fromAddress:string, toAddress:string, amount:number, senderKeypair:Keypair){
+//   const transaction= new Transaction();
+//   const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+//   const fromPubkey = new PublicKey(fromAddress);
+//   const toPubkey = new PublicKey(toAddress);
 
-  const sendSolInstruction = SystemProgram.transfer({
-    fromPubkey: fromPubkey,
-    toPubkey: toPubkey,
-    lamports: LAMPORTS_PER_SOL * amount,
-  });
-  transaction.add(sendSolInstruction);
-  const signature = await sendAndConfirmTransaction(connection, transaction, [
-    senderKeypair,
-  ]);
+//   const sendSolInstruction = SystemProgram.transfer({
+//     fromPubkey: fromPubkey,
+//     toPubkey: toPubkey,
+//     lamports: LAMPORTS_PER_SOL * amount,
+//   });
+//   transaction.add(sendSolInstruction);
+//   const signature = await sendAndConfirmTransaction(connection, transaction, [
+//     senderKeypair,
+//   ]);
 
-  if(signature){
-      return ("transaction passed"+signature);
-  }
-  return "transaction failed";
-}
+//   if(signature){
+//       return ("transaction passed"+signature);
+//   }
+//   return "transaction failed";
+// }
 
-async function ethTransaction(){
+// async function ethTransaction(fromAddress: string, toAddress: string, amount: number, senderKeypair: ethers.HDNodeWallet) {
+//   const amountInWei = utils.toWei(amount, 'ether');
+//   const tx = {
+//     from: fromAddress,
+//     to: toAddress,
+//     value: amountInWei,
+//     gasPrice: utils.toWei('5', 'gwei'),
+//     gasLimit: 21000, 
+//   };
+//   const privateKey = senderKeypair.privateKey;
 
-}
+// }
+
 
 
   return (
